@@ -1,1 +1,71 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+
+public class GradeCalculatorGUI extends JFrame {
+    private DefaultListModel<Integer> model = new DefaultListModel<>();
+    private JList<Integer> markList = new JList<>(model);
+    private JTextField input = new JTextField(5);
+    private JLabel totalLabel = new JLabel("Total: 0");
+    private JLabel avgLabel = new JLabel("Average: 0");
+    private JLabel gradeLabel = new JLabel("Grade: N/A");
+    private ArrayList<Integer> marks = new ArrayList<>();
+
+    public GradeCalculatorGUI() {
+        super("Grade Calculator");
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setLayout(new FlowLayout());
+
+        add(new JLabel("Enter marks (0–100):"));
+        add(input);
+        JButton addBtn = new JButton("Add");
+        add(addBtn);
+        add(new JScrollPane(markList));
+
+        JButton calcBtn = new JButton("Calculate");
+        add(calcBtn);
+        add(totalLabel);
+        add(avgLabel);
+        add(gradeLabel);
+
+        addBtn.addActionListener(e -> {
+            try {
+                int m = Integer.parseInt(input.getText());
+                if (m < 0 || m > 100) throw new NumberFormatException();
+                marks.add(m);
+                model.addElement(m);
+                input.setText("");
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Enter valid 0–100 integer");
+            }
+        });
+
+        calcBtn.addActionListener(e -> calculate());
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
+
+    private void calculate() {
+        int total = marks.stream().mapToInt(Integer::intValue).sum();
+        double avg = marks.isEmpty() ? 0 : total * 1.0 / marks.size();
+        String grade;
+        if (avg >= 90) grade = "A+";
+        else if (avg >= 80) grade = "A";
+        else if (avg >= 70) grade = "B";
+        else if (avg >= 60) grade = "C";
+        else if (avg >= 50) grade = "D";
+        else grade = "F";
+
+        totalLabel.setText("Total: " + total);
+        avgLabel.setText(String.format("Average: %.2f", avg));
+        gradeLabel.setText("Grade: " + grade);
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(GradeCalculatorGUI::new);
+    }
+}
 
